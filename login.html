@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In / Register — HOMI Furnitures</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-body">
+
+<!-- Server-free version of the login page: works even when opened
+     directly (file://) — accounts are stored in the browser.
+     The PHP + MySQL version lives in login.php (for XAMPP). -->
+<a class="auth-back" href="index.html">&larr; Back to store</a>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+
+    <div class="auth-brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11.5 12 4l9 7.5"/>
+          <path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/>
+          <path d="M9.5 20v-6h5v6"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="name">HOMI</div>
+        <div class="sub">FURNITURES</div>
+      </div>
+    </div>
+
+    <h1 id="authHeading">Welcome back</h1>
+    <p class="auth-sub" id="authSub">Sign in to your HOMI account for order tracking and saved favorites.</p>
+
+    <div class="auth-alert auth-alert-error" id="authAlert" style="display:none;"></div>
+
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab active" data-tab="login">Sign In</button>
+      <button type="button" class="auth-tab" data-tab="register">Create Account</button>
+    </div>
+
+    <!-- ===== Sign in ===== -->
+    <form id="loginForm" class="auth-form active">
+      <div class="form-field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" name="email" autocomplete="email" required>
+      </div>
+      <div class="form-field">
+        <label for="loginPassword">Password</label>
+        <div class="pass-wrap">
+          <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
+          <button type="button" class="pass-toggle" data-target="loginPassword">Show</button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-green btn-block">SIGN IN</button>
+      <p class="auth-switch">New to HOMI? <button type="button" class="link-btn" data-goto="register">Create an account</button></p>
+    </form>
+
+    <!-- ===== Register ===== -->
+    <form id="registerForm" class="auth-form">
+      <div class="form-field">
+        <label for="regName">Full Name</label>
+        <input type="text" id="regName" name="name" autocomplete="name" required>
+      </div>
+      <div class="form-field">
+        <label for="regEmail">Email</label>
+        <input type="email" id="regEmail" name="email" autocomplete="email" required>
+      </div>
+      <div class="form-field">
+        <label for="regPassword">Password</label>
+        <div class="pass-wrap">
+          <input type="password" id="regPassword" name="password" autocomplete="new-password" minlength="8" required>
+          <button type="button" class="pass-toggle" data-target="regPassword">Show</button>
+        </div>
+        <small class="field-hint">Use at least 8 characters.</small>
+      </div>
+      <div class="form-field">
+        <label for="regConfirm">Confirm Password</label>
+        <input type="password" id="regConfirm" name="confirm" autocomplete="new-password" required>
+      </div>
+      <button type="submit" class="btn btn-green btn-block">CREATE ACCOUNT</button>
+      <p class="auth-switch">Already have an account? <button type="button" class="link-btn" data-goto="login">Sign in</button></p>
+    </form>
+
+  </div>
+</div>
+
+<script src="login.js"></script>
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!-- HOMI Furnitures homepage (static/guest view). Session-aware version: index.php -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOMI Furnitures — Where Comfort Feels Like Home</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11.5 12 4l9 7.5"/>
+          <path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/>
+          <path d="M9.5 20v-6h5v6"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="name">HOMI</div>
+        <div class="sub">FURNITURES</div>
+      </div>
+    </div>
+
+    <nav class="nav-links" id="navLinks" aria-label="Primary">
+      <a href="#top" class="active">HOME</a>
+      <a href="#collections">COLLECTION</a>
+      <a href="#about">ABOUT US</a>
+      <a href="#gallery">GALLERY</a>
+      <a href="#contact">CONTACT</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button type="button" class="icon-btn" id="searchBtn" title="Search" aria-label="Toggle search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+      </button>
+      <a href="login.html" id="accountLink" class="icon-btn" title="Account" aria-label="Account">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/>
+        </svg>
+      </a>
+      <button type="button" class="icon-btn" id="cartBtn" title="Cart" aria-label="Open cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 6h2l1.4 10.2a1.6 1.6 0 0 0 1.6 1.4h8a1.6 1.6 0 0 0 1.6-1.3L20 9H6.2"/>
+          <circle cx="10" cy="21" r="1"/><circle cx="17" cy="21" r="1"/>
+        </svg>
+        <span class="cart-badge" id="cartCount">0</span>
+      </button>
+      <button class="btn btn-green" id="quoteBtn" type="button">GET A QUOTE</button>
+      <button type="button" class="hamburger" id="menuToggle" aria-label="Toggle menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="search-bar" id="searchBar">
+    <div class="wrap search-bar-inner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" aria-label="Search collections and products" placeholder="Search collections and products...">
+      <button class="search-close-btn" id="searchClose" type="button" aria-label="Close search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4 4 20"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile">
+    <a href="#top" class="active">HOME</a>
+    <a href="#collections">COLLECTION</a>
+    <a href="#about">ABOUT US</a>
+    <a href="#gallery">GALLERY</a>
+    <a href="#contact">CONTACT</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="dots" id="heroDots"></div>
+      <div class="hero-copy">
+        <div class="eyebrow">WELCOME TO HOMI FURNITURES</div>
+        <h1>Where Comfort Feels Like Home.</h1>
+        <p>We create stylish, functional and quality furniture that brings comfort and warmth to every home.</p>
+        <div class="hero-actions">
+          <a href="#collections" class="btn btn-green">EXPLORE MORE COLLECTION</a>
+          <a href="#bestseller" class="btn-hero-outline">VIEW CATALOG</a>
+        </div>
+      </div>
+      <div class="hero-img">
+        <img id="heroImage" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1200&auto=format&fit=crop" alt="Modern living room with orange sofa">
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="perks">
+        <div class="perk">
+          <div class="perk-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8.4 8 9 4.6-.6 8-4 8-9V6l-8-3Z"/></svg>
+          </div>
+          <div><h4>FREE DELIVERY</h4><p>Fast and reliable delivery right to your home.</p></div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11v8H2z"/><path d="M13 11h4l3 3v2h-7z"/><circle cx="6" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+          </div>
+          <div><h4>EASY RETURNS</h4><p>Fast and reliable delivery right to your home.</p></div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          </div>
+          <div><h4>SECURE PAYMENT</h4><p>Safe, secure and hassle-free payment options.</p></div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="6" rx="1.2"/><rect x="17" y="13" width="4" height="6" rx="1.2"/></svg>
+          </div>
+          <div><h4>EXCELLENT SUPPORT</h4><p>We're here to help you every step of the way.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="wrap about-grid">
+      <div class="about-img-wrap">
+        <div class="about-kicker">VIEW CATALOG</div>
+        <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?q=80&w=1000&auto=format&fit=crop" alt="Dining room table setting">
+      </div>
+      <div class="about-copy">
+        <div class="eyebrow">ABOUT HOMI</div>
+        <h2>Designed for Living. Made for Home.</h2>
+        <p>HOMI Furniture is dedicated to providing high-quality furniture that brings function and beauty together. We believe every piece has the power to transform a house into a home.</p>
+        <div class="pillars">
+          <div class="pillar">
+            <svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.8" fill="currentColor"/></svg>
+            <h4>MISSION</h4>
+            <p>To provide stylish, functional and quality furniture that brings comfort to every home.</p>
+          </div>
+          <div class="pillar">
+            <svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+            <h4>VISION</h4>
+            <p>To be a trusted furniture brand known for timeless design and excellent customer experience.</p>
+          </div>
+          <div class="pillar">
+            <svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12a4 4 0 1 0-3.5-6"/><path d="M16 12a4 4 0 1 1 3.5-6"/><path d="M3 20c1-3 3.6-4.5 6-4.5"/><path d="M21 20c-1-3-3.6-4.5-6-4.5"/><path d="M9.5 13.5a3 3 0 0 0 5 0"/></svg>
+            <h4>VALUES</h4>
+            <ul>
+              <li>Integrity</li><li>Innovation</li><li>Sustainability</li><li>Customer Focus</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLLECTIONS -->
+  <section class="collections" id="collections">
+    <div class="wrap">
+      <a href="#collections" class="btn btn-tan">EXPLORE OUR COLLECTIONS</a>
+      <div class="coll-grid">
+        <div class="coll-card">
+          <div class="img"><img src="https://images.unsplash.com/photo-1631679706909-1844bbd07221?q=80&w=800&auto=format&fit=crop" alt="Living room"></div>
+          <div class="coll-info">
+            <h4>LIVING ROOM</h4>
+            <button type="button" class="view-details-btn"
+              data-name="Living Room"
+              data-img="https://images.unsplash.com/photo-1631679706909-1844bbd07221?q=80&w=1200&auto=format&fit=crop"
+              data-desc="HOMI living room pieces bring comfort and style through modern, functional design built for everyday living — from sectional sofas to accent chairs and coffee tables.">
+              VIEW DETAILS →
+            </button>
+          </div>
+        </div>
+        <div class="coll-card">
+          <div class="img"><img src="https://images.unsplash.com/photo-1617104551722-3b2d51366400?q=80&w=800&auto=format&fit=crop" alt="Dining room"></div>
+          <div class="coll-info">
+            <h4>DINING ROOM</h4>
+            <button type="button" class="view-details-btn"
+              data-name="Dining Room"
+              data-img="https://images.unsplash.com/photo-1617104551722-3b2d51366400?q=80&w=1200&auto=format&fit=crop"
+              data-desc="Gather in style with HOMI dining sets — solid wood tables, upholstered chairs, and sideboards designed to make every meal feel special.">
+              VIEW DETAILS →
+            </button>
+          </div>
+        </div>
+        <div class="coll-card">
+          <div class="img"><img src="https://images.unsplash.com/photo-1615874959474-d609969a20ed?q=80&w=800&auto=format&fit=crop" alt="Bedroom"></div>
+          <div class="coll-info">
+            <h4>BEDROOM</h4>
+            <button type="button" class="view-details-btn"
+              data-name="Bedroom"
+              data-img="https://images.unsplash.com/photo-1615874959474-d609969a20ed?q=80&w=1200&auto=format&fit=crop"
+              data-desc="Restful, refined bedroom furniture — from platform beds to nightstands and wardrobes — built for comfort and lasting quality.">
+              VIEW DETAILS →
+            </button>
+          </div>
+        </div>
+        <div class="coll-card">
+          <div class="img"><img src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=800&auto=format&fit=crop" alt="Home office"></div>
+          <div class="coll-info">
+            <h4>HOME OFFICE</h4>
+            <button type="button" class="view-details-btn"
+              data-name="Home Office"
+              data-img="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1200&auto=format&fit=crop"
+              data-desc="Stay productive in a space you love — HOMI home office furniture pairs clean lines with practical storage and ergonomic comfort.">
+              VIEW DETAILS →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSPIRED SPACES -->
+  <section id="gallery">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Inspired Spaces</h2>
+        <p class="lead">See how HOMI furniture transforms everyday spaces.</p>
+      </div>
+      <div class="spaces-grid">
+        <div class="img"><img src="https://images.unsplash.com/photo-1616137466211-f939a420be84?q=80&w=600&auto=format&fit=crop" alt="Space 1"></div>
+        <div class="img"><img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=600&auto=format&fit=crop" alt="Space 2"></div>
+        <div class="img"><img src="https://images.unsplash.com/photo-1449247709967-d4461a6a6103?q=80&w=600&auto=format&fit=crop" alt="Space 3"></div>
+        <div class="img"><img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=600&auto=format&fit=crop" alt="Space 4"></div>
+        <div class="img"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=600&auto=format&fit=crop" alt="Space 5"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="wrap">
+      <div class="section-head"><h2>What Our Customers Say</h2></div>
+      <div class="review-shell">
+        <button type="button" class="rev-arrow prev" id="revPrev" aria-label="Previous review">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <div class="review-track" id="reviewTrack"></div>
+        <button type="button" class="rev-arrow next" id="revNext" aria-label="Next review">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEST SELLER -->
+  <section class="best" id="bestseller">
+    <div class="wrap">
+      <a href="#bestseller" class="btn btn-green">BEST SELLER</a>
+      <div class="best-grid">
+        <div class="product-card">
+          <div class="img">
+            <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?q=80&w=600&auto=format&fit=crop" alt="Living room set">
+            <div class="price-tag">$3,867</div>
+            <button type="button" class="buy-btn"
+              data-name="Living Room Furniture Set"
+              data-price="3867"
+              data-img="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?q=80&w=200&auto=format&fit=crop">BUY NOW</button>
+          </div>
+          <div class="product-body">
+            <h4>Living Room</h4>
+            <p>HOMI furniture brings comfort and style to the living room through modern and functional design for everyday living.</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="img">
+            <img src="https://images.unsplash.com/photo-1595428774223-ef52624120d2?q=80&w=600&auto=format&fit=crop" alt="Wall furniture">
+            <div class="price-tag">$1,456</div>
+            <button type="button" class="buy-btn"
+              data-name="Walling Furniture"
+              data-price="1456"
+              data-img="https://images.unsplash.com/photo-1595428774223-ef52624120d2?q=80&w=200&auto=format&fit=crop">BUY NOW</button>
+          </div>
+          <div class="product-body">
+            <h4>Walling Furniture</h4>
+            <p>HOMI walling furniture adds character and organization to the home, combining simple design with practical storage.</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="img">
+            <img src="https://images.unsplash.com/photo-1556911220-bff31c812dba?q=80&w=600&auto=format&fit=crop" alt="Kitchen furniture">
+            <div class="price-tag">$1,653</div>
+            <button type="button" class="buy-btn"
+              data-name="Kitchen Room Furniture"
+              data-price="1653"
+              data-img="https://images.unsplash.com/photo-1556911220-bff31c812dba?q=80&w=200&auto=format&fit=crop">BUY NOW</button>
+          </div>
+          <div class="product-body">
+            <h4>Kitchen Room</h4>
+            <p>HOMI kitchen furniture provides a clean and functional space where style, comfort, and practicality meet.</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="img">
+            <img src="https://images.unsplash.com/photo-1568992687947-868a62a9f521?q=80&w=600&auto=format&fit=crop" alt="Home office furniture">
+            <div class="price-tag">$4,379</div>
+            <button type="button" class="buy-btn"
+              data-name="Home Office Furniture"
+              data-price="4379"
+              data-img="https://images.unsplash.com/photo-1568992687947-868a62a9f521?q=80&w=200&auto=format&fit=crop">BUY NOW</button>
+          </div>
+          <div class="product-body">
+            <h4>Home Office Furniture</h4>
+            <p>HOMI home office furniture offers a clean, comfortable workspace that keeps you organized and productive.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY CHOOSE -->
+  <section class="why">
+    <div class="wrap">
+      <a href="#collections" class="btn btn-green">VIEW ALL COLLECTION</a>
+      <div class="section-head why-head"><h2>Why Choose HOMI?</h2></div>
+      <div class="why-grid">
+        <div class="why-item">
+          <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 6.5 3 3L8 19l-4 1 1-4Z"/><path d="m17 4 3 3"/></svg></div>
+          <h4>QUALITY CRAFTSMANSHIP</h4><p>Built with attention to detail and fine craftsmanship.</p>
+        </div>
+        <div class="why-item">
+          <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12M6 21h12"/><path d="M8 3c0 4 8 4 8 8s-8 4-8 8"/><path d="M16 3c0 4-8 4-8 8s8 4 8 8"/></svg></div>
+          <h4>TIMELESS DESIGN</h4><p>Elegant designs that stay beautiful through every season.</p>
+        </div>
+        <div class="why-item">
+          <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13h16v5H4z"/><path d="M5 13v-2a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v2"/><path d="M4 18v2M20 18v2"/></svg></div>
+          <h4>COMFORT FIRST</h4><p>Ergonomic and functional for your everyday comfort.</p>
+        </div>
+        <div class="why-item">
+          <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/></svg></div>
+          <h4>MADE FOR MODERN HOMES</h4><p>Practical pieces that suit modern living and small spaces.</p>
+        </div>
+        <div class="why-item">
+          <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="4"/><rect x="4" y="10" width="16" height="4"/><rect x="4" y="16" width="16" height="4"/></svg></div>
+          <h4>RELIABLE MATERIALS</h4><p>Strong, durable, and made to last for years to come.</p>
+        </div>
+        <div class="why-item">
+          <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="12" height="12"/><path d="M8 20h8M12 16v4M16 8h4v4"/></svg></div>
+          <h4>DESIGNED WITH PURPOSE</h4><p>Every piece is created with care and intention.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED -->
+  <section class="featured">
+    <div class="wrap">
+      <div class="feat-grid">
+        <div class="img"><img src="https://images.unsplash.com/photo-1615529162924-f8605388461d?q=80&w=900&auto=format&fit=crop" alt="Dining room with art"></div>
+        <div class="feat-copy">
+          <div class="eyebrow">FEATURED PRODUCT</div>
+          <h2>Bring Your Space to Life</h2>
+          <p>Discover furniture designed to make every room feel more comfortable, functional, and beautifully yours.</p>
+          <a href="#bestseller" class="btn btn-green btn-fit">SHOP NOW</a>
+        </div>
+        <div class="img"><img src="https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=900&auto=format&fit=crop" alt="Accent chair"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="cta-top">
+    <div class="wrap">
+      <h2>Ready to make your space feel like home?</h2>
+      <p>Explore our collection and find the perfect pieces that match your lifestyle.</p>
+    </div>
+  </div>
+  <div class="cta-bottom">
+    <div class="wrap cta-row">
+      <a href="#collections" class="btn btn-outline">EXPLORE OUR COLLECTION</a>
+      <div class="contact-grid">
+        <div><h5>VISIT OUR SHOWROOM</h5>123 Furniture St.<br>Davao City, Philippines</div>
+        <div><h5>CONTACT US</h5>0912-56895<br>0924-55221</div>
+        <div><h5>EMAIL US</h5>homifurnitures.ph<br>homifurnitures@gmail.com</div>
+        <div><h5>STORE HOURS</h5>Mon–Sat: 9:00–5:00 PM<br>Sun: Closed</div>
+      </div>
+      <button class="btn btn-outline" id="sendMessageBtn" type="button">SEND MESSAGE</button>
+    </div>
+    <div class="wrap cta-brand-row">
+      <div class="cta-brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/><path d="M9.5 20v-6h5v6"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="name footer-brand-name">HOMI</div>
+          <div class="sub footer-brand-sub">Where Content Follow Like Home.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot-note">© ALL RIGHT RESERVED 2026–2028</div>
+</footer>
+
+<!-- ===== Quote Modal ===== -->
+<div class="modal-overlay" id="quoteModal">
+  <div class="modal">
+    <button type="button" class="modal-close" data-close-modal="quoteModal" aria-label="Close">✕</button>
+    <h3>Request a Quote</h3>
+    <p class="modal-sub">Tell us what you're looking for and we'll get back to you within 24 hours.</p>
+    <form id="quoteForm" novalidate>
+      <div class="form-field"><label for="quoteName">Full Name</label><input type="text" id="quoteName" name="name" required></div>
+      <div class="form-field"><label for="quoteEmail">Email</label><input type="email" id="quoteEmail" name="email" required></div>
+      <div class="form-field"><label for="quotePhone">Phone</label><input type="tel" id="quotePhone" name="phone"></div>
+      <div class="form-field">
+        <label for="quoteInterest">Interested In</label>
+        <select name="interest" id="quoteInterest">
+          <option>Living Room</option>
+          <option>Dining Room</option>
+          <option>Bedroom</option>
+          <option>Home Office</option>
+          <option>Custom Project</option>
+        </select>
+      </div>
+      <div class="form-field"><label for="quoteMessage">Message</label><textarea id="quoteMessage" name="message" rows="3" placeholder="Tell us more about your space..."></textarea></div>
+      <button type="submit" class="btn btn-green btn-block">SUBMIT REQUEST</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== Contact Modal ===== -->
+<div class="modal-overlay" id="contactModal">
+  <div class="modal">
+    <button type="button" class="modal-close" data-close-modal="contactModal" aria-label="Close">✕</button>
+    <h3>Send Us a Message</h3>
+    <p class="modal-sub">Have a question? Drop us a line and our team will respond shortly.</p>
+    <form id="contactForm" novalidate>
+      <div class="form-field"><label for="contactName">Name</label><input type="text" id="contactName" name="name" required></div>
+      <div class="form-field"><label for="contactEmail">Email</label><input type="email" id="contactEmail" name="email" required></div>
+      <div class="form-field"><label for="contactMessage">Message</label><textarea id="contactMessage" name="message" rows="4" required></textarea></div>
+      <button type="submit" class="btn btn-green btn-block">SEND MESSAGE</button>
+    </form>
+  </div>
+</div>
+
+
+<!-- ===== Collection Details Modal ===== -->
+<div class="modal-overlay" id="detailsModal">
+  <div class="modal modal-wide">
+    <button type="button" class="modal-close" data-close-modal="detailsModal" aria-label="Close">✕</button>
+    <img id="detailsImg" src="https://images.unsplash.com/photo-1631679706909-1844bbd07221?q=80&w=1200&auto=format&fit=crop" alt="Collection preview" class="modal-img">
+    <h3 id="detailsTitle">Collection Details</h3>
+    <p id="detailsDesc" class="modal-sub"></p>
+    <button class="btn btn-green btn-block" id="detailsQuoteBtn" type="button">GET A QUOTE FOR THIS ROOM</button>
+  </div>
+</div>
+
+<!-- ===== Cart Drawer ===== -->
+<div class="cart-overlay" id="cartOverlay">
+  <aside class="cart-drawer">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button type="button" class="modal-close" id="cartClose" aria-label="Close cart">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <div class="cart-total"><span>Subtotal</span><span id="cartSubtotal">$0</span></div>
+      <button class="btn btn-green btn-block" id="checkoutBtn" type="button">CHECKOUT</button>
+    </div>
+  </aside>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
