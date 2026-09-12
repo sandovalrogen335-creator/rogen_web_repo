@@ -65,56 +65,51 @@ document.getElementById('sendMessageBtn').addEventListener('click', function () 
   openModal('contactModal');
 });
 
-/* ---------- Signed-in greeting on the homepage (localStorage) ---------- */
-/* The static homepage (index.html) shows "HI, NAME · LOG OUT" when the
-   visitor signed in through login.html. */
-(function () {
-  var accountLink = document.getElementById('accountLink');
-  if (!accountLink) return;
-
-  var userName = null;
-  try { userName = window.localStorage.getItem('homi_user'); } catch (e) { return; }
-  if (!userName) return;
-
-  var chip = document.createElement('div');
-  chip.className = 'user-chip';
-  chip.title = 'Signed in as ' + userName;
-
-  var hi = document.createElement('span');
-  hi.className = 'user-hi';
-  hi.textContent = 'HI, ' + userName.split(' ')[0].toUpperCase();
-
-  var out = document.createElement('a');
-  out.href = '#';
-  out.className = 'user-logout';
-  out.textContent = 'LOG OUT';
-  out.addEventListener('click', function (e) {
-    e.preventDefault();
-    try { window.localStorage.removeItem('homi_user'); } catch (err) {}
-    window.location.reload();
-  });
-
-  chip.appendChild(hi);
-  chip.appendChild(out);
-  accountLink.parentNode.replaceChild(chip, accountLink);
-})();
-
 /* ---------- Quote form ---------- */
 document.getElementById('quoteForm').addEventListener('submit', function (e) {
   e.preventDefault();
   if (!this.checkValidity()) { this.reportValidity(); return; }
-  showToast("Thanks! Your quote request has been sent — we'll reach out within 24 hours.");
-  this.reset();
-  closeModal('quoteModal');
+  var form = this;
+  var data = new FormData(form);
+  data.append('type', 'quote');
+  fetch('submit_form.php', { method: 'POST', body: data })
+    .then(function (res) { return res.json(); })
+    .then(function (json) {
+      if (json && json.ok) {
+        showToast("Thanks! Your quote request has been sent — we'll reach out within 24 hours.");
+        form.reset();
+        closeModal('quoteModal');
+      } else {
+        showToast((json && json.errors && json.errors[0]) || 'Something went wrong. Please try again.');
+      }
+    })
+    .catch(function () {
+      showToast('Could not reach the server. Please try again.');
+    });
 });
 
 /* ---------- Contact form ---------- */
 document.getElementById('contactForm').addEventListener('submit', function (e) {
   e.preventDefault();
   if (!this.checkValidity()) { this.reportValidity(); return; }
-  showToast('Message sent! Our team will get back to you shortly.');
-  this.reset();
-  closeModal('contactModal');
+  var form = this;
+  var data = new FormData(form);
+  data.append('type', 'contact');
+  data.append('csrf_token', HOMI_CSRF);
+  fetch('submit_form.php', { method: 'POST', body: data })
+    .then(function (res) { return res.json(); })
+    .then(function (json) {
+      if (json && json.ok) {
+        showToast('Message sent! Our team will get back to you shortly.');
+        form.reset();
+        closeModal('contactModal');
+      } else {
+        showToast((json && json.errors && json.errors[0]) || 'Something went wrong. Please try again.');
+      }
+    })
+    .catch(function () {
+      showToast('Could not reach the server. Please try again.');
+    });
 });
 
 /* ---------- Collection "View Details" modal ---------- */
@@ -197,6 +192,13 @@ function addToCart(product) {
   updateCartCount();
   showToast(product.name + ' added to your cart');
   openCart();
+
+  syncCartAdd(product).then(function (res) {
+    if (res && res.ok && res.id) {
+      var target = cart.filter(function (i) { return i.name === product.name; })[0];
+      if (target && !target.id) target.id = res.id;
+    }
+  });
 }
 
 document.querySelectorAll('.buy-btn').forEach(function (btn) {
@@ -214,13 +216,22 @@ document.getElementById('cartItems').addEventListener('click', function (e) {
   if (!btn) return;
   var idx = parseInt(btn.dataset.idx, 10);
   var action = btn.dataset.action;
+  var item = cart[idx];
+
   if (action === 'inc') {
-    cart[idx].qty += 1;
+    item.qty += 1;
+    syncCartSetQty(item.id, item.qty);
   } else if (action === 'dec') {
-    cart[idx].qty -= 1;
-    if (cart[idx].qty <= 0) cart.splice(idx, 1);
+    item.qty -= 1;
+    if (item.qty <= 0) {
+      cart.splice(idx, 1);
+      syncCartSetQty(item.id, 0);
+    } else {
+      syncCartSetQty(item.id, item.qty);
+    }
   } else if (action === 'remove') {
     cart.splice(idx, 1);
+    syncCartRemove(item.id);
   }
   renderCart();
   updateCartCount();
@@ -236,14 +247,36 @@ document.getElementById('checkoutBtn').addEventListener('click', function () {
     showToast('Your cart is empty.');
     return;
   }
-  showToast('Order placed! Thank you for shopping with HOMI.');
-  cart = [];
-  renderCart();
-  updateCartCount();
-  closeCart();
+  if (!HOMI_LOGGED_IN) {
+    showToast('Please sign in to check out.');
+    window.location.href = 'login.php';
+    return;
+  }
+  fetch('checkout.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cart: cart, csrf_token: HOMI_CSRF })
+  })
+    .then(function (res) { return res.json(); })
+    .then(function (json) {
+      if (json && json.ok) {
+        showToast('Order placed! Thank you for shopping with HOMI.');
+        cart = [];
+        renderCart();
+        updateCartCount();
+        closeCart();
+      } else {
+        showToast((json && json.errors && json.errors[0]) || 'Could not place your order.');
+        if (json && json.needsLogin) window.location.href = 'login.php';
+      }
+    })
+    .catch(function () {
+      showToast('Could not reach the server. Please try again.');
+    });
 });
 
 renderCart();
+loadServerCart();
 
 /* ---------- Search ---------- */
 var searchBar = document.getElementById('searchBar');
@@ -405,3 +438,41 @@ document.getElementById('revNext').addEventListener('click', function () {
   renderReviews();
 });
 renderReviews();
+
+function syncCartAdd(item) {
+  if (!HOMI_LOGGED_IN) return Promise.resolve(null);
+  return fetch('cart.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'add', name: item.name, price: item.price, img: item.img, csrf_token: HOMI_CSRF })
+  }).then(function (r) { return r.json(); }).catch(function () { return null; });
+}
+function syncCartSetQty(id, qty) {
+  if (!HOMI_LOGGED_IN || !id) return;
+  fetch('cart.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'set_qty', id: id, qty: qty, csrf_token: HOMI_CSRF })
+  });
+}
+function syncCartRemove(id) {
+  if (!HOMI_LOGGED_IN || !id) return;
+  fetch('cart.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'remove', id: id, csrf_token: HOMI_CSRF })
+  });
+}
+function loadServerCart() {
+  if (!HOMI_LOGGED_IN) return;
+  fetch('cart.php')
+    .then(function (r) { return r.json(); })
+    .then(function (json) {
+      if (json && json.ok) {
+        cart = json.items;
+        renderCart();
+        updateCartCount();
+      }
+    })
+    .catch(function () {});
+}

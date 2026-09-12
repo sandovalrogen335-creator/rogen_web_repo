@@ -7,6 +7,8 @@
    ========================================================= */
 
 session_start();
+require 'db_connect.php';
+require 'csrf.php';
 
 // Already signed in? Go straight to the store.
 if (isset($_SESSION['user_id'])) {
@@ -14,119 +16,87 @@ if (isset($_SESSION['user_id'])) {
     exit;
 }
 
-/* ---------- Database settings (default XAMPP values) ---------- */
-$DB_HOST = 'localhost';
-$DB_USER = 'root';
-$DB_PASS = '';        // default XAMPP MySQL password is empty
-$DB_NAME = 'homi_db';
+/* ---------- Basic brute-force throttling ---------- */
+const MAX_ATTEMPTS   = 5;
+const LOCKOUT_SECONDS = 300; // 5 minutes
 
-$db = null;
-$db_error = '';
-
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-try {
-    $db = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
-    $db->set_charset('utf8mb4');
-} catch (mysqli_sql_exception $e) {
-    $db = null;
-    $db_error = 'Database not reachable. Start MySQL in XAMPP/WAMP and import database.sql, then reload this page.';
+function too_many_attempts() {
+    if (empty($_SESSION['login_attempts'])) return false;
+    if (time() - ($_SESSION['login_attempts_time'] ?? 0) > LOCKOUT_SECONDS) {
+        $_SESSION['login_attempts'] = 0;
+        return false;
+    }
+    return $_SESSION['login_attempts'] >= MAX_ATTEMPTS;
+}
+function register_failed_attempt() {
+    $_SESSION['login_attempts'] = ($_SESSION['login_attempts'] ?? 0) + 1;
+    $_SESSION['login_attempts_time'] = time();
+}
+function clear_failed_attempts() {
+    unset($_SESSION['login_attempts'], $_SESSION['login_attempts_time']);
 }
 
 /* ---------- Handle form submissions ---------- */
 $errors     = [];
-$active_tab = 'login';                       // tab to show after a failed attempt
-$old        = ['name' => '', 'email' => '']; // re-fill fields after a failed attempt
+$active_tab = 'login';
+$old        = ['name' => '', 'email' => ''];
 
-// "ajax=1" is sent by the page's JavaScript so the form can be handled
-// without a full page reload — the server answers with JSON instead.
 $is_ajax = (($_POST['ajax'] ?? '') === '1');
 $is_post = ($_SERVER['REQUEST_METHOD'] === 'POST');
 
 if ($is_post && !$db) {
-    // MySQL isn't running / database missing — tell the AJAX caller
     if ($is_ajax) $errors[] = $db_error;
 }
 
 if ($is_post && $db) {
-    $action = $_POST['action'] ?? '';
+    if (!csrf_verify($_POST['csrf_token'] ?? '')) {
+        $errors[] = 'Your session expired. Please refresh the page and try again.';
+    } else {
+        $action = $_POST['form_action'] ?? '';
 
-    try {
-        /* ----- REGISTER ----- */
-        if ($action === 'register') {
-            $active_tab = 'register';
-            $name    = trim($_POST['name'] ?? '');
-            $email   = trim($_POST['email'] ?? '');
-            $pass    = $_POST['password'] ?? '';
-            $confirm = $_POST['confirm'] ?? '';
+        try {
+            /* ----- REGISTER ----- */
+            if ($action === 'register') {
+                $active_tab = 'register';
+                $name    = trim($_POST['name'] ?? '');
+                $email   = trim($_POST['email'] ?? '');
+                $pass    = $_POST['password'] ?? '';
+                $confirm = $_POST['confirm'] ?? '';
 
-            $old['name']  = $name;
-            $old['email'] = $email;
+                $old['name']  = $name;
+                $old['email'] = $email;
 
-            if ($name === '' || strlen($name) < 2)          $errors[] = 'Please enter your full name.';
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Please enter a valid email address.';
-            if (strlen($pass) < 8)                          $errors[] = 'Password must be at least 8 characters.';
-            if ($pass !== $confirm)                         $errors[] = 'Passwords do not match.';
+                if ($name === '' || strlen($name) < 2)          $errors[] = 'Please enter your full name.';
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Please enter a valid email address.';
+                if (strlen($pass) < 8)                          $errors[] = 'Password must be at least 8 characters.';
+                if ($pass !== $confirm)                         $errors[] = 'Passwords do not match.';
 
-            if (!$errors) {
-                // Make sure the email isn't taken yet
-                $stmt = $db->prepare('SELECT user_id FROM users WHERE email = ? LIMIT 1');
-                $stmt->bind_param('s', $email);
-                $stmt->execute();
-                $exists = $stmt->get_result()->num_rows > 0;
-                $stmt->close();
+                if (!$errors) {
+                    $stmt = $db->prepare('SELECT user_id FROM users WHERE email = ? LIMIT 1');
+                    $stmt->bind_param('s', $email);
+                    $stmt->execute();
+                    $exists = $stmt->get_result()->num_rows > 0;
+                    $stmt->close();
 
-                if ($exists) {
-                    $errors[] = 'That email is already registered — try signing in instead.';
+                    if ($exists) {
+                        $errors[] = 'That email is already registered — try signing in instead.';
+                    }
                 }
-            }
 
-            if (!$errors) {
-                // Store the password as a secure hash — never as plain text
-                // (matches the existing users table: name, email, password, role)
-                $hash = password_hash($pass, PASSWORD_DEFAULT);
-                $stmt = $db->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'customer')");
-                $stmt->bind_param('sss', $name, $email, $hash);
-                $stmt->execute();
-                $new_id = $db->insert_id;
-                $stmt->close();
+                if (!$errors) {
+                    $hash = password_hash($pass, PASSWORD_DEFAULT);
+                    $stmt = $db->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'customer')");
+                    $stmt->bind_param('sss', $name, $email, $hash);
+                    $stmt->execute();
+                    $new_id = $db->insert_id;
+                    $stmt->close();
 
-                // Auto sign-in and go to the store
-                session_regenerate_id(true);
-                $_SESSION['user_id']   = $new_id;
-                $_SESSION['user_name'] = $name;
-                if ($is_ajax) {
-                    header('Content-Type: application/json; charset=utf-8');
-                    echo json_encode(['ok' => true]);
-                    exit;
-                }
-                header('Location: index.php');
-                exit;
-            }
-        }
-
-        /* ----- LOGIN ----- */
-        if ($action === 'login') {
-            $active_tab = 'login';
-            $email = trim($_POST['email'] ?? '');
-            $pass  = $_POST['password'] ?? '';
-
-            $old['email'] = $email;
-
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Please enter a valid email address.';
-            if ($pass === '')                               $errors[] = 'Please enter your password.';
-
-            if (!$errors) {
-                // users table columns: user_id, name, email, password, ...
-                $stmt = $db->prepare('SELECT user_id, name, password FROM users WHERE email = ? LIMIT 1');
-                $stmt->bind_param('s', $email);
-                $stmt->execute();
-                $user = $stmt->get_result()->fetch_assoc();
-                $stmt->close();
-
-                if ($user && password_verify($pass, $user['password'])) {
                     session_regenerate_id(true);
-                    $_SESSION['user_id']   = (int) $user['user_id'];
-                    $_SESSION['user_name'] = $user['name'];
+                    $_SESSION['user_id']   = $new_id;
+                    $_SESSION['user_name'] = $name;
+                    $_SESSION['user_role'] = 'customer';
+                    clear_failed_attempts();
+
                     if ($is_ajax) {
                         header('Content-Type: application/json; charset=utf-8');
                         echo json_encode(['ok' => true]);
@@ -135,23 +105,65 @@ if ($is_post && $db) {
                     header('Location: index.php');
                     exit;
                 }
-                $errors[] = 'Incorrect email or password.';
             }
+
+            /* ----- LOGIN ----- */
+            if ($action === 'login') {
+                $active_tab = 'login';
+
+                if (too_many_attempts()) {
+                    $errors[] = 'Too many failed attempts. Please wait a few minutes and try again.';
+                } else {
+                    $email = trim($_POST['email'] ?? '');
+                    $pass  = $_POST['password'] ?? '';
+                    $old['email'] = $email;
+
+                    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Please enter a valid email address.';
+                    if ($pass === '')                               $errors[] = 'Please enter your password.';
+
+                    if (!$errors) {
+                        $stmt = $db->prepare('SELECT user_id, name, password, role FROM users WHERE email = ? LIMIT 1');
+                        $stmt->bind_param('s', $email);
+                        $stmt->execute();
+                        $user = $stmt->get_result()->fetch_assoc();
+                        $stmt->close();
+
+                        if ($user && password_verify($pass, $user['password'])) {
+                            session_regenerate_id(true);
+                            $_SESSION['user_id']   = (int) $user['user_id'];
+                            $_SESSION['user_name'] = $user['name'];
+                            $_SESSION['user_role'] = $user['role'];
+                            clear_failed_attempts();
+
+                            if ($is_ajax) {
+                                header('Content-Type: application/json; charset=utf-8');
+                                echo json_encode(['ok' => true]);
+                                exit;
+                            }
+                            header('Location: index.php');
+                            exit;
+                        }
+
+                        register_failed_attempt();
+                        $errors[] = 'Incorrect email or password.';
+                    }
+                }
+            }
+        } catch (mysqli_sql_exception $e) {
+            error_log('Login/register DB error: ' . $e->getMessage());
+            $errors[] = 'Something went wrong. Please try again.';
         }
-    } catch (mysqli_sql_exception $e) {
-        $errors[] = 'Database error: ' . $e->getMessage();
     }
 }
 
-// AJAX requests get a JSON answer instead of a full page reload
 if ($is_post && $is_ajax) {
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode(['ok' => false, 'errors' => $errors], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-/* Escape helper for safe HTML output */
 function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
+$token = csrf_token();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -204,7 +216,8 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
 
     <!-- ===== Sign in ===== -->
     <form id="loginForm" class="auth-form<?= $active_tab === 'login' ? ' active' : '' ?>" method="post" action="login.php">
-      <input type="hidden" name="action" value="login">
+      <input type="hidden" name="form_action" value="login">
+      <input type="hidden" name="csrf_token" value="<?= e($token) ?>">
       <div class="form-field">
         <label for="loginEmail">Email</label>
         <input type="email" id="loginEmail" name="email" value="<?= e($old['email']) ?>" autocomplete="email" required>
@@ -222,7 +235,8 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
 
     <!-- ===== Register ===== -->
     <form id="registerForm" class="auth-form<?= $active_tab === 'register' ? ' active' : '' ?>" method="post" action="login.php">
-      <input type="hidden" name="action" value="register">
+      <input type="hidden" name="form_action" value="register">
+      <input type="hidden" name="csrf_token" value="<?= e($token) ?>">
       <div class="form-field">
         <label for="regName">Full Name</label>
         <input type="text" id="regName" name="name" value="<?= e($old['name']) ?>" autocomplete="name" required>
@@ -251,19 +265,12 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
 </div>
 
 <script>
-/* ---------- Tab switching (Sign In / Create Account) ---------- */
 (function () {
   var heading = document.getElementById('authHeading');
   var sub     = document.getElementById('authSub');
   var copy = {
-    login: {
-      h: 'Welcome back',
-      s: 'Sign in to your HOMI account for order tracking and saved favorites.'
-    },
-    register: {
-      h: 'Create your account',
-      s: 'Join HOMI to track orders, save favorites and check out faster.'
-    }
+    login: { h: 'Welcome back', s: 'Sign in to your HOMI account for order tracking and saved favorites.' },
+    register: { h: 'Create your account', s: 'Join HOMI to track orders, save favorites and check out faster.' }
   };
 
   function showTab(name) {
@@ -285,7 +292,6 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
     b.addEventListener('click', function () { showTab(this.dataset.goto); });
   });
 
-  /* ---------- Show / hide password ---------- */
   document.querySelectorAll('.pass-toggle').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var input = document.getElementById(this.dataset.target);
@@ -295,7 +301,6 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
     });
   });
 
-  /* ---------- AJAX submit — errors show instantly, NO page reload ---------- */
   var tabs = document.querySelector('.auth-tabs');
 
   function showAlert(messages) {
@@ -316,7 +321,6 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
   }
 
   function handleSubmit(form) {
-    // We preventDefault() ourselves, so run the browser validation manually
     if (!form.checkValidity()) { form.reportValidity(); return; }
 
     var btn = form.querySelector('button[type="submit"]');
@@ -325,14 +329,14 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
     btn.textContent = 'PLEASE WAIT…';
 
     var data = new FormData(form);
-    data.append('ajax', '1'); // ask the server for a JSON answer
+    data.append('ajax', '1');
 
     fetch(form.action, { method: 'POST', body: data })
       .then(function (res) { return res.json(); })
       .then(function (json) {
         if (json && json.ok) {
           btn.textContent = 'SUCCESS — OPENING STORE…';
-          window.location.replace('index.php'); // signed in, go to homepage
+          window.location.replace('index.php');
           return;
         }
         showAlert(json && json.errors && json.errors.length
@@ -349,11 +353,11 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
   }
 
   document.getElementById('loginForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // stop the page from reloading
+    e.preventDefault();
     handleSubmit(this);
   });
   document.getElementById('registerForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // stop the page from reloading
+    e.preventDefault();
     handleSubmit(this);
   });
 })();

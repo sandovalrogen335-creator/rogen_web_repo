@@ -52,7 +52,7 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
       </button>
       <?php if ($user_name): ?>
       <div class="user-chip" title="Signed in as <?= e($user_name) ?>">
-        <span class="user-hi">HI, <?= e(strtoupper($first_name)) ?></span>
+        <a href="profile.php" class="user-hi">HI, <?= e(strtoupper($first_name)) ?></a>
         <a href="logout.php" class="user-logout">LOG OUT</a>
       </div>
       <?php else: ?>
@@ -429,6 +429,7 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
     <h3>Request a Quote</h3>
     <p class="modal-sub">Tell us what you're looking for and we'll get back to you within 24 hours.</p>
     <form id="quoteForm" novalidate>
+      <input type="hidden" name="csrf_token" value="<?= e($token) ?>">
       <div class="form-field"><label for="quoteName">Full Name</label><input type="text" id="quoteName" name="name" required></div>
       <div class="form-field"><label for="quoteEmail">Email</label><input type="email" id="quoteEmail" name="email" required></div>
       <div class="form-field"><label for="quotePhone">Phone</label><input type="tel" id="quotePhone" name="phone"></div>
@@ -455,6 +456,7 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
     <h3>Send Us a Message</h3>
     <p class="modal-sub">Have a question? Drop us a line and our team will respond shortly.</p>
     <form id="contactForm" novalidate>
+      <input type="hidden" name="csrf_token" value="<?= e($token) ?>">
       <div class="form-field"><label for="contactName">Name</label><input type="text" id="contactName" name="name" required></div>
       <div class="form-field"><label for="contactEmail">Email</label><input type="email" id="contactEmail" name="email" required></div>
       <div class="form-field"><label for="contactMessage">Message</label><textarea id="contactMessage" name="message" rows="4" required></textarea></div>
@@ -491,7 +493,10 @@ function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
 
 <!-- Toasts -->
 <div class="toast-container" id="toastContainer"></div>
-
+<script>
+  var HOMI_CSRF = "<?= e($token) ?>";
+  var HOMI_LOGGED_IN = <?= $user_name ? 'true' : 'false' ?>;
+</script>s
 <script src="script.js"></script>
 </body>
 </html>
